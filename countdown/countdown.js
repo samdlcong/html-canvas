@@ -4,6 +4,9 @@ var RADIUS = 8;
 var MARGIN_TOP = 60;
 var MARGIN_LEFT = 30;
 
+const endTime = new Date(2017,0,14,12,13,14);
+var curShowTimeSeconds = 0;
+
 window.onload = function(){
 	var canvas = document.getElementById("canvas");
 	canvas.width = WINDOW_WIDTH;
@@ -13,15 +16,44 @@ window.onload = function(){
 	} else {
 		alert("当前浏览器不支持Canvas，请更换浏览器后再试");
 	}
-	render(context);
-	
+	curShowTimeSeconds = getCurrentShowTimeSeconds();
+	setInterval(
+		function(){
+			render(context);
+			update();
+		}
+
+	);	
 };
 
+function getCurrentShowTimeSeconds(){
+	var curTime = new Date();
+	var ret = endTime.getTime() - curTime.getTime();
+	ret = Math.round(ret/1000);
+	return ret >= 0?ret:0;
+}
+
+function update(){
+	var nextShowTimeSeconds = getCurrentShowTimeSeconds();
+
+	var nextHours = parseInt(nextShowTimeSeconds/3600);
+	var nextMinutes = parseInt((nextShowTimeSeconds-nextHours*3600)/60);
+	var nextSeconds = nextShowTimeSeconds%60;
+
+	var curHours = parseInt(curShowTimeSeconds/3600);
+	var curMinutes = parseInt((curShowTimeSeconds-curHours*3600)/60);
+	var curSeconds = curShowTimeSeconds %60;
+	if(nextSeconds != curSeconds){
+		curShowTimeSeconds = nextShowTimeSeconds;
+	}
+}
+
 function render(cxt){
-	
-	var hours = 12;
-	var minutes = 34;
-	var seconds = 56;
+	cxt.clearRect(0,0,WINDOW_WIDTH,WINDOW_HEIGHT);
+
+	var hours = parseInt(curShowTimeSeconds/3600);
+	var minutes = parseInt(curShowTimeSeconds - hours*3600)/60;
+	var seconds = curShowTimeSeconds%60;
 
 	renderDigit(MARGIN_LEFT,MARGIN_TOP,parseInt(hours/10),cxt);
 	renderDigit(MARGIN_LEFT+15*(RADIUS+1),MARGIN_TOP,parseInt(hours%10),cxt);
